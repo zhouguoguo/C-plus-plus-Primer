@@ -3,13 +3,18 @@
 using namespace std;
 
 struct Sales_data {
+	friend istream& read(istream&, Sales_data &i);
+
+	Sales_data() = default;
+	Sales_data(const string& s, unsigned u, double p) : 
+				bookNo(s), units_solds(u), revenue(u*p){}
+	Sales_data(const string& s) : bookNo(s){}
+	Sales_data(istream&);
+
 	string isbn() const {return bookNo;}
 	Sales_data& combine(const Sales_data&);
-	double ave_price() {
-		if (units_solds == 0) return 0;
-		return revenue / units_solds;
-	}
-	string bookNo;
+	double ave_price() const;
+	std::string bookNo;
 	unsigned units_solds = 0;
 	double revenue = 0.0;
 };
@@ -36,9 +41,19 @@ ostream& print(ostream& os, Sales_data& data)
 	      data.units_solds << 
 	      " copies, average price is " <<
 	      data.ave_price() <<
-	      " total revenue is " <<
+	      ", total revenue is " <<
 	      data.revenue;
 	return os;
+}
+
+double Sales_data::ave_price() const {
+	if (units_solds == 0) return 0;
+	return revenue / units_solds;
+}
+
+Sales_data::Sales_data(istream& is)
+{
+	read(is, *this);
 }
 
 Sales_data& Sales_data::combine(const Sales_data& data)
@@ -50,20 +65,23 @@ Sales_data& Sales_data::combine(const Sales_data& data)
 
 int main()
 {
-	Sales_data total;
-	if (read(cin, total)) {
+	Sales_data total(cin);
+	if (cin) {
 		Sales_data cur_data;
-		while (read(cin, cur_data)) {
-			if (total.isbn() != cur_data.isbn())
+		while(read(cin, cur_data)) {
+			if (total.isbn() == cur_data.isbn())
 			{
+				total.combine(cur_data);
+			}
+			else {
 				print(cout, total) << endl;
 				total = cur_data;
 			}
-			else {
-				total.combine(cur_data);
-			}
 		}
 		print(cout, total) << endl;
+	} else {
+		cerr << "No data?!" << endl;
 	}
+
 	return 0;
 }
