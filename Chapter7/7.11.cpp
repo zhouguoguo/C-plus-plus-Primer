@@ -3,13 +3,18 @@
 using namespace std;
 
 struct Sales_data {
+	friend istream& read(istream&, Sales_data &i);
+
+	Sales_data() = default;
+	Sales_data(const string& s, unsigned u, double p) : 
+				bookNo(s), units_solds(u), revenue(u*p){}
+	Sales_data(const string& s) : bookNo(s){}
+	Sales_data(istream&);
+
 	string isbn() const {return bookNo;}
 	Sales_data& combine(const Sales_data&);
-	double ave_price() {
-		if (units_solds == 0) return 0;
-		return revenue / units_solds;
-	}
-	string bookNo;
+	double ave_price() const;
+	std::string bookNo;
 	unsigned units_solds = 0;
 	double revenue = 0.0;
 };
@@ -19,7 +24,6 @@ istream& read(istream& is, Sales_data &in_data)
 	double price = 0.0;
 	is >> in_data.bookNo >> in_data.units_solds >> price;
 	in_data.revenue = price * in_data.units_solds;
-	return is;
 }
 
 Sales_data add(const Sales_data& data1, const Sales_data& data2)
@@ -36,9 +40,19 @@ ostream& print(ostream& os, Sales_data& data)
 	      data.units_solds << 
 	      " copies, average price is " <<
 	      data.ave_price() <<
-	      " total revenue is " <<
+	      ", total revenue is " <<
 	      data.revenue;
 	return os;
+}
+
+double Sales_data::ave_price() const {
+	if (units_solds == 0) return 0;
+	return revenue / units_solds;
+}
+
+Sales_data::Sales_data(istream& is)
+{
+	read(is, *this);
 }
 
 Sales_data& Sales_data::combine(const Sales_data& data)
@@ -50,20 +64,17 @@ Sales_data& Sales_data::combine(const Sales_data& data)
 
 int main()
 {
-	Sales_data total;
-	if (read(cin, total)) {
-		Sales_data cur_data;
-		while (read(cin, cur_data)) {
-			if (total.isbn() != cur_data.isbn())
-			{
-				print(cout, total) << endl;
-				total = cur_data;
-			}
-			else {
-				total.combine(cur_data);
-			}
-		}
-		print(cout, total) << endl;
-	}
+	Sales_data s1;
+	print(cout, s1) << endl;
+
+	Sales_data s2("Book1", 1, 55);
+	print(cout, s2) << endl;
+
+	Sales_data s3("Book2");
+	print(cout, s3) << endl;
+
+	Sales_data s4(cin);
+	print(cout, s4) << endl;
+
 	return 0;
 }
