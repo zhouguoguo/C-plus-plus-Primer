@@ -34,7 +34,7 @@ void printIntStack(stack<int> opdStack)
 	cout << "opdStack:\n";
 	while (!opdStack.empty())
 	{
-		cout << opdStack.top() - '0' << endl;
+		cout << opdStack.top()<< endl;
 		opdStack.pop();
 	}
 }
@@ -71,11 +71,11 @@ void calculate(stack<char>& optStack, stack<int>& opdStack)
 	while (!optStack.empty() && optStack.top() != '(') {
 		char opt = optStack.top();
 		optStack.pop();
-		int opd1 = opdStack.top() - '0';
+		int opd1 = opdStack.top();
 		opdStack.pop();
-		int opd2 = opdStack.top() - '0';
+		int opd2 = opdStack.top();
 		opdStack.pop();
-		opdStack.push(calculate_once(opt, opd2, opd1) + '0');
+		opdStack.push(calculate_once(opt, opd2, opd1));
 	}
 	if (!optStack.empty() && optStack.top() == '(')
 	{
@@ -92,7 +92,7 @@ int process(const string& str)
 	{
 		cout << "\ncurrent char:" << ch << endl;
 		if (isdigit(ch)) {
-			opdStack.push(ch);
+			opdStack.push(ch - '0');
 		}
 		else if (isOpt(ch)){
 			if (ch == ')')
@@ -128,7 +128,7 @@ int process(const string& str)
 
 int main()
 {
-	string s = "(1+2)*(1+(3-1)/6)";
+	string s = "(1-2)*(1+(3-1)*6)";
 	process(s);
 
 	return 0;
